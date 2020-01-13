@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<title>KFW Lab</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<body>
+
+    <style>
+        .embedly-card-hug {
+            background-color:white;
+            padding: 20px;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 4px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <!-- Navbar (sit on top) -->
+    <div class="w3-top">
+        <div class="w3-card-2 w3-animate-top w3-black" id="myNavbar">
+          <a class="w3-bar-item w3-button w3-hover-black w3-hide-medium w3-hide-large w3-right" href="javascript:void(0);" onclick="toggleFunction()" title="Toggle Navigation Menu">
+            <i class="fa fa-bars"></i>
+          </a>
+          <a href="index.html" class="w3-bar-item w3-button w3-hover-black">HOME</a>
+          <a href="index.html#about" class="w3-bar-item w3-button w3-hover-black w3-hide-small"><i class="fa fa-info-circle"></i> ABOUT</a>
+          <a href="news.html" class="w3-bar-item w3-button w3-hover-black w3-hide-small"><i class="fa fa-newspaper-o"></i> NEWS</a>
+          <a href="publications.html" class="w3-bar-item w3-button w3-hide-small w3-hover-black"><i class="fa fa-book"></i> PUBLICATIONS</a>
+          <a href="members.html" class="w3-bar-item w3-button w3-hide-small w3-hover-black"><i class="fa fa-user"></i> MEMBERS</a>
+          <a href="index.html#contact" class="w3-bar-item w3-button w3-hide-small w3-hover-black"><i class="fa fa-envelope"></i> CONTACT</a>
+        </div>
+      
+        <!-- Navbar on small screens -->
+        <div id="navDemo" class="w3-bar-block w3-gray w3-hide w3-hide-large w3-hide-medium">
+          <a href="index.html#about" class="w3-bar-item w3-button" onclick="toggleFunction()">ABOUT</a>
+          <a href="news.html" class="w3-bar-item w3-button" onclick="toggleFunction()">NEWS</a>
+          <a href="publications.html" class="w3-bar-item w3-button" onclick="toggleFunction()">PUBLICATIONS</a>
+          <a href="members.html" class="w3-bar-item w3-button" onclick="toggleFunction()">MEMBERS</a>
+          <a href="index.html#contact" class="w3-bar-item w3-button" onclick="toggleFunction()">CONTACT</a>
+        </div>
+    </div>
+
+    <iframe id="my_iframe" style="display:none;"></iframe>
+
+    <div class="w3-display-container" style="margin-top:4.5em;">
+        <div class="w3-center" style="white-space:nowrap;padding:3em;">
+            <span class="w3-center w3-padding-large w3-black w3-xlarge w3-wide">KFW LAB NEWS</span>
+        </div>
+    </div>
+
+    <blockquote class="embedly-card" data-card-controls="0">
+        <h4><a href="https://medium.com/@KFW_Lab">Kelsey Fisher Wellman - Medium</a></h4>
+        <p>Assistant professor - East Carolina Diabetes and Obesity Institute, #Mitochondria all the time, #ECU #ECUBrodySOM</p>
+    </blockquote>
+
+    <script>
+
+        // Used to toggle the menu on small screens when clicking on the menu button
+        function toggleFunction() {
+            var x = document.getElementById("navDemo");
+            if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show";
+            } else {
+                x.className = x.className.replace(" w3-show", "");
+            }
+        }
+        window.onload = function() {
+            getPostData();
+        };
+
+        // Change style of navbar on scroll
+        // window.onscroll = function() {
+        //     myFunction();
+        // };
+
+        function getPostData(){
+            var request = new XMLHttpRequest();
+
+            // CORS restricts non-medium.com domains from accessing medium.com so...I had to set up a proxy via cors-escape
+            request.open("GET", "https://kfw-proxy.herokuapp.com/https://medium.com/@KFW_Lab?format=json");
+
+            request.onload = function() {
+            if (request.status >= 200 && request.status < 400) {
+                // Success!
+                var data = request.responseText.split('])}while(1);</x>')[1] //splits off anti-hijacking code
+                var data = JSON.parse(data);
+
+                // Retrieves the title, subtitle, and unique slug of each post for 
+                // the profile and then creates an embedly for each
+                for (post in data["payload"]["references"]["Post"]){
+                    post = data["payload"]["references"]["Post"][post];
+
+                    var title = post["title"];
+                    var subtitle = post["content"]["subtitle"];
+                    var uniqueSlug = post["uniqueSlug"];
+                    createEmbedly(uniqueSlug, title, subtitle);
+                }
+            } else {
+                // We reached our target server, but it returned an error
+                console.log("OOP!: The server returned an error.");
+            }
+            };
+
+            request.send();
+
+        }
+
+        function myFunction() {
+            var navbar = document.getElementById("myNavbar");
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                navbar.className = "w3-bar" + " w3-card-2" + " w3-animate-top" + " w3-black";
+            } else {
+                // navbar.className = navbar.className.replace(" w3-card-2 w3-animate-top w3-black", "");
+            }
+        }
+
+        function createEmbedly(url, story_title, story_subtitle){
+            url = "https://medium.com/@KFW_Lab/" + url
+            var iDiv = document.createElement('blockquote');
+            var link = document.createElement('a');
+            var title = document.createElement('h4');
+            var subtitle = document.createElement('p');
+
+            iDiv.className = 'embedly-card';
+            link.href = url
+            link.text = story_title
+            subtitle.innerText = story_subtitle
+            title.appendChild(link)
+            iDiv.appendChild(title)
+            iDiv.appendChild(subtitle)
+            document.getElementsByTagName('body')[0].appendChild(iDiv);
+        }
+    </script>
+
+    <script async src="platform.js" charset="UTF-8"></script>
+</body>
+            
